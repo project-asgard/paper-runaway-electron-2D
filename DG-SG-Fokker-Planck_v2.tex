@@ -57,6 +57,9 @@
 \ead{linmu@uga.edu}
 %
 \author[1]{Louis Wonnell}
+\author[1]{Timothy Younkin}
+\author[1]{B. Tyler McDaniel}
+\author[1]{Harry Hughes}
 %
 \address[1]{Fusion Energy Division, Oak Ridge National Laboratory, Oak Ridge, TN 37831, USA}
 \address[2]{Computer Science and Mathematics Division, Oak Ridge National Laboratory, Oak Ridge, TN 37831, USA}
@@ -329,9 +332,19 @@ where the bi-linear forms are defined as \todo{why are all the bi-linear forms b
 -\sum_{K_{\xi}\in \mathcal{T}_{h,\xi}}\int_{K_{\xi}}w\frac{\partial}{\partial\xi}\left[(1-\xi^2)v\right]d\xi+
 \sum_{j=0}^{2^N} \left[\{ \widehat{w}\}\ljump(1-\xi^2)v\rjump
 \right]_{\xi_j}.
-\end{eqnarray}\todo{i don't understand why there are average operators on the flux and jump operators on the test function in the boundary terms? {\color{blue}By Lin: symbols are modified.}}
+\end{eqnarray}
+%
+\todo{i don't understand why there are average operators on the flux and jump operators on the test function in the boundary terms? {\color{blue}By Lin: symbols are modified.}}
 
-Here the terms $\left\{\hat{\cdot}\right}$ \todo{this is confusing - the hat terms are the numerical fluxes right? can we just write that since the average operator has already been defined above.{\color{blue}By Lin: symbols have been modified.}} are defined as numerical fluxes on the cell boundaries. In DG methods, the discontinuity of approximation basis at cell interfaces interior to the domain are not well-defined (in fact are dual valued). The numerical trace, {\color{blue}which is the value restricted on the boundary cells,} \todo{why is it called a numerical trace now, and not a numerical flux? {\color{blue}By Lin: One more sentence has been added.}} is introduced as a well-defined single value on the cell interfaces for our discontinuous scheme. There are several choices for the numerical fluxes, each of which yields different scheme properties. For example, the central flux, taking the average value from adjacent cells on the interior edge, tends to preserve the energy \cite{zhang2003analysis} \todo{ref?{\color{blue}Done}}; the upwind flux, choosing the flux value from the cell in the upwind direction, provides better stability; the alternating flux, changing the directions between two different quantities, can show super-convergence in some simulations \cite{Castillo2006,CockburnShu1998}\todo{i assume these are general statements for LDG and not specific to us - so add refs{\color{blue}Done}}. An illustration of this choice of flux is shown in Assume the wind direction is from left to right, the central flux and upwind flux are plotted in  for piecewise discontinuous linear functions. The alternating flux takes different directions for two approximating quantities.
+Here the terms $\{\hat{\cdot}\}$ 
+%
+\todo{this is confusing - the hat terms are the numerical fluxes right? can we just write that since the average operator has already been defined above.{\color{blue}By Lin: symbols have been modified.}} 
+%
+are defined as numerical fluxes on the cell boundaries. In DG methods, the discontinuity of approximation basis at cell interfaces interior to the domain are not well-defined (in fact are dual valued). The numerical trace, {\color{blue}which is the value restricted on the boundary cells,} 
+%
+\todo{why is it called a numerical trace now, and not a numerical flux? {\color{blue}By Lin: One more sentence has been added.}} 
+%
+is introduced as a well-defined single value on the cell interfaces for our discontinuous scheme. There are several choices for the numerical fluxes, each of which yields different scheme properties. For example, the central flux, taking the average value from adjacent cells on the interior edge, tends to preserve the energy \cite{zhang2003analysis} \todo{ref?{\color{blue}Done}}; the upwind flux, choosing the flux value from the cell in the upwind direction, provides better stability; the alternating flux, changing the directions between two different quantities, can show super-convergence in some simulations \cite{Castillo2006,CockburnShu1998}\todo{i assume these are general statements for LDG and not specific to us - so add refs{\color{blue}Done}}. An illustration of this choice of flux is shown in Assume the wind direction is from left to right, the central flux and upwind flux are plotted in  for piecewise discontinuous linear functions. The alternating flux takes different directions for two approximating quantities.
 
 \begin{figure}[H]
 \centering
@@ -1168,21 +1181,19 @@ Take the integral with respect to $\xi$ and denote the results as the trace. We 
 
 \section{Sparse grid (2D) Discretization and Testing}
 \label{sec:sparse-grid-scheme}
-
-
+%
 \subsection{Sparse-Grid Finite Element Space}
 \label{sec:2d-fe-space}
-The sparse grids finite element space is constructed by selecting the proper subset of the full grids finite element space.
-We shall denote the sparse-grid finite element space $\mathcal{V}^N_k$ as follows,
+The sparse-grid finite element space is constructed by truncating the full-grid finite element space. We denote the sparse-grid finite element space $\mathcal{V}^N_k$ as follows,
+%
 \begin{eqnarray}
-\mathcal{V}_k^N=\bigoplus_{|n_1+n_2|\le N}{\bf W}_k^{\bf n}, \text{ where } {\bf n} = (n_1,n_2), \ {\bf n}\in\mathbb{N}_0^d
 \label{Def:SG2D}
+\mathcal{V}_k^N=\bigoplus_{|n_1+n_2|\le N}{\bf W}_k^{\bf n}, \text{ where } {\bf n} = (n_1,n_2), \ {\bf n}\in\mathbb{N}_0^d
 \end{eqnarray}
+%
+The finite element spaces for full-grids in (\ref{Def:FG2D}) and sparse-grids in (\ref{Def:SG2D}) are defined by selecting the finite element space using different norms: the full-grid space uses $|{\bf n}|_{\infty}\le N$ and the sparse-grid space employs $|{\bf n}|_1\le N$. The use of the 1-norm (sometimes refered to as \it{total level}) in selecting the elements results in fewer degree of freedom for the sparse-grid solution  $\mathcal{O}(N2^N) when compared with $\mathcal{O}(2^N\cdot 2^N)$ for the full-grid.
 
-\begin{remark}
-The finite element space defined in (\ref{Def:FG2D}) and (\ref{Def:SG2D}) are selecting finite element space by different norms: the full grids space are using $|{\bf n}|_{\infty}\le N$ and the sparse grids space are using $|{\bf n}|_1\le N$. Due to the usage of selecting criterion, the degree of freedom for sparse grids finite element space is reduced from $\mathcal{O}(2^N\cdot 2^N)$ to $\mathcal{O}(N2^N)$.
-\end{remark}
-In this section, we shall discuss the implementation of sparse grids to the two-dimensional Fokker-Planck problem described by equations (\ref{eq:2DModel-1})-(\ref{eq:2DModel-3}). The addition of the acceleration of runaway electrons due to an electric field presents challenges for efficient finite element simulations. Numerical solutions demonstrate non-Maxwellian characteristics, with electrons moving towards the direction selected by the electric field. With these solutions, even traditional sparse grid methods may not be the most efficient approach. Therefore, the implementation of adaptivity is also discussed, demonstrating the effectiveness of time-dependent grids for this Fokker-Planck problem. 
+In this section we compare the sparse-grid solution of our two-dimensional Fokker-Planck model described by equations (\ref{eq:2DModel-1})-(\ref{eq:2DModel-3}) to that of the full-grid to examine if the prospective benefits of sparse-grids extend to this particular problem and our particular choice of coordinate system. The addition of the acceleration of runaway electrons due to an electric field presents challenges for efficient finite element simulations. Numerical solutions demonstrate non-Maxwellian characteristics, with electrons moving towards the direction selected by the electric field. With these solutions, even traditional sparse grid methods may not be the most efficient approach. Therefore, the implementation of adaptivity is also discussed, demonstrating the effectiveness of time-dependent grids for this Fokker-Planck problem. 
 
 Figure \ref{fig:2DAdaptContour} illustrates the importance of sparse-grid and adaptive sparse-grid approaches to the complete 2D problem. Full-grid approaches establish grids simply based on the initial parameters of degree and level. As the domain increases, the computational cost rises exponentially with the grid level, and linearly with the degree. The solution, here, does not change significantly for large portions of the domain. The unadapted sparse-grid algorithms remove elements where small gradients in the initial condition are found. Thus, elements in the darker regions of the RE distribution are eliminated. 
 
