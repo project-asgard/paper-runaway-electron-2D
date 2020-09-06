@@ -27,6 +27,8 @@
 \newcommand{\bv}{{\bf v}}
 \newcommand{\T}{{\mathcal T}}
 
+
+
 \def\ljump{{[\![}}
 \def\rjump{{]\!]}}
 
@@ -41,7 +43,7 @@
 \journal{Computer Physics Communications}
 \begin{document}
 \begin{frontmatter}
-\title{A Sparse-Grid Discontinuous Galerkin Approach to Simulating Runaway Electron Dynamics}
+\title{A High-Order Sparse-Grid Discontinuous Galerkin Approach to Simulating Runaway Electron Dynamics}
 %
 \tnotetext[t1]{This manuscript has been authored in part by UT-Battelle, LLC, under contract DE-AC05-00OR22725 with the US Department of Energy (DOE). The US government retains and the publisher, by accepting the article for publication, acknowledges that the US government retains a nonexclusive, paid-up, irrevocable, worldwide license to publish or reproduce the published form of this manuscript, or allow others to do so, for US government purposes. DOE will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan (http://energy.gov/downloads/doe-public-access-plan).} 
 %
@@ -60,6 +62,7 @@
 \author[1]{Timothy Younkin}
 \author[1]{B. Tyler McDaniel}
 \author[1]{Harry Hughes}
+\author[1]{M. Graham Lopez}
 %
 \address[1]{Fusion Energy Division, Oak Ridge National Laboratory, Oak Ridge, TN 37831, USA}
 \address[2]{Computer Science and Mathematics Division, Oak Ridge National Laboratory, Oak Ridge, TN 37831, USA}
@@ -393,7 +396,7 @@ where $P_L$ is the Legendre polynomial of degree $L$, and the coefficients $h_L$
  f_0(\xi)=\sum_{L=0}^\infty h_L P_L(\xi)\, .
 \eq
 %
-\noindent{\bf Test~\ref{Subsec:Pitch-2}} 
+\noindent{\bf Test \texttt{fokkerplanck1\_pitch\_C}}: 
 In this test, we shall choose the initial condition as (\ref{pitch_Coll_ic}) with $L=0,\dots,6$ and $h_0=3$,  $h_1=0.5$,  $h_2=1$,  $h_3=0.7$,  $h_4=3$,  $h_6=3$.
 Figure~\ref{Fig:pitch_coll}(a) plots the solution for different time periods.
 %
@@ -466,7 +469,7 @@ where $f_0(\xi)$ is the initial condition. The general analytical solution of th
 f(\xi,t)=\left[ \frac{1-\phi^2}{1-\xi^2}\right]\, f_0(\phi)\, , \qquad \phi=\tanh \left( \tanh^{-1} \xi -t \right) \, .
 \eq
 
-\noindent{\bf Test~\ref{Subsec:Pitch-1}a} First we set the initial condition as $f_0=1$ and the solution is plotted in Figure~\ref{Fig:Pitch_E_1}. 
+\noindent{\bf Test \texttt{fokkerplanck1\_pitch\_E (case=1)}:} First we set the initial condition as $f_0=1$ and the solution is plotted in Figure~\ref{Fig:Pitch_E_1}. 
 It is noted that, as shown in the figure, the solution asymptotically approaches a Dirac delta function centered at $\xi=1$. 
 \todo{TY: Based on my attempted verification, these results are using downwind flux. By Lin: This is Hyperbolic equation. Does downwind work?}
 %
@@ -520,7 +523,7 @@ The error profiles and convergence results are reported in Table~\ref{Tab:Pitch_
 Numerical experiments have been carried out on the mesh with $N = 5$, $k = 4$, and the numerical solutions are plotted in Figure~\ref{Fig:Pitch_E_1-Num2} for central flux and upwind flux. Since the solution approaches a Dirac delta function centered at $\xi$, the numerical solution cannot capture the analytical solutions on the right end point after several time steps. Thus, one begins to observe oscillations in the plot for both fluxes. Though the upwind flux cannot provide an oscillation-free scheme, the undershoots are around coordinate $1$. By using center flux, however, the numerical solution is oscillating in the whole domain. This test shows the advantage of upwind flux.
 
 \vskip.1in
-\noindent{\bf Test~\ref{Subsec:Pitch-1}b} In this test, we set the initial condition as $f_0=\exp (-\xi^2/\sigma^2)$ with $\sigma=0.1$ and the solution is plotted in Figure~\ref{Fig:Pitch_E_2}. It is noted that, as shown in the figure, the solution asymptotically approaches a Dirac delta function centered at $\xi=1$.
+\noindent{\bf Test \texttt{fokkerplanck1\_pitch\_E (case=2):}} In this test, we set the initial condition as $f_0=\exp (-\xi^2/\sigma^2)$ with $\sigma=0.1$ and the solution is plotted in Figure~\ref{Fig:Pitch_E_2}. It is noted that, as shown in the figure, the solution asymptotically approaches a Dirac delta function centered at $\xi=1$.
 
 \begin{figure}[H]
 \centering
@@ -1191,7 +1194,7 @@ The sparse-grid finite element space is constructed by truncating the full-grid 
 \mathcal{V}_k^N=\bigoplus_{|n_1+n_2|\le N}{\bf W}_k^{\bf n}, \text{ where } {\bf n} = (n_1,n_2), \ {\bf n}\in\mathbb{N}_0^d
 \end{eqnarray}
 %
-The finite element spaces for full-grids in (\ref{Def:FG2D}) and sparse-grids in (\ref{Def:SG2D}) are defined by selecting the finite element space using different norms: the full-grid space uses $|{\bf n}|_{\infty}\le N$ and the sparse-grid space employs $|{\bf n}|_1\le N$. The use of the 1-norm (sometimes refered to as \it{total level}) in selecting the elements results in fewer degree of freedom for the sparse-grid solution  $\mathcal{O}(N2^N) when compared with $\mathcal{O}(2^N\cdot 2^N)$ for the full-grid.
+The finite element spaces for full-grids in (\ref{Def:FG2D}) and sparse-grids in (\ref{Def:SG2D}) are defined by selecting the finite element space using different norms: the full-grid space uses $|{\bf n}|_{\infty}\le N$ and the sparse-grid space employs $|{\bf n}|_1\le N$. The use of the 1-norm (sometimes refered to as {\it total level}) in selecting the elements results in fewer degree of freedom for the sparse-grid solution  $\mathcal{O}(N2^N)$ when compared with $\mathcal{O}(2^N\cdot 2^N)$ for the full-grid.
 
 In this section we compare the sparse-grid solution of our two-dimensional Fokker-Planck model described by equations (\ref{eq:2DModel-1})-(\ref{eq:2DModel-3}) to that of the full-grid to examine if the prospective benefits of sparse-grids extend to this particular problem and our particular choice of coordinate system. The addition of the acceleration of runaway electrons due to an electric field presents challenges for efficient finite element simulations. Numerical solutions demonstrate non-Maxwellian characteristics, with electrons moving towards the direction selected by the electric field. With these solutions, even traditional sparse grid methods may not be the most efficient approach. Therefore, the implementation of adaptivity is also discussed, demonstrating the effectiveness of time-dependent grids for this Fokker-Planck problem. 
 
