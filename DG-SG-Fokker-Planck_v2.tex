@@ -4,6 +4,9 @@
 \usepackage{tikz}
 \usepackage{dcolumn}
 \usepackage{xcolor}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
 
 %------------------------------------
 % Just for adding readable todo notes
@@ -21,6 +24,20 @@
 % DLG comment inline command
 \newcommand{\dlg}[1]{\todo[nolist,size=\small, color=green!40]{#1}}
 
+\lstnewenvironment{code}[1][]
+{
+  \lstset{
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=lines,
+    extendedchars=true,
+    captionpos=b,
+    caption=#1,
+    literate={,}{{,\allowbreak}}{1}
+  }
+}
+{
+}
 \newcommand{\bU}{{\bf U}}
 \newcommand{\bn}{{\bf n}}
 \newcommand{\bx}{{\bf x}}
@@ -1092,7 +1109,7 @@ The initial condition is chosen as
 
 
 \subsubsection{Full-Grid Runaway production rate test}
-\label{sec:FullModel-2}
+\label{sec:fokkerplanck2_complete}
 - Notes on the production rate test \todo{**DIEGO**}
 In this section, let the computational domain as $[-1,1]\times[0,20]$ and we shall approximate the numerical solution to equation (\ref{eq:2DModel-1})-(\ref{eq:2DModel-3}). In the implementation of our algorithm, the upwind flux will be employed other than the collision operator; the collision operator will use alternation flux to approximate. 
 In the following tests, we shall define the following mass functions:
@@ -1102,7 +1119,7 @@ In the following tests, we shall define the following mass functions:
 \end{eqnarray}
 where $p_\text{cutoff}$ is a chosen cutoff value for momentum variable $p.$
 
-\noindent{\bf Test \ref{sec:FullModel-2}}
+\noindent{\bf Test \ref{sec:fokkerplanck2_complete}}
 We shall choose the following Maxwellian distribution as the initial condition
 \begin{equation*}
     f_0(\xi,p) = Q\exp(-\frac{2}{\delta^2}\sqrt{1+\delta^2p^2}),
@@ -1119,7 +1136,7 @@ The initial condition is plotted in Fig~\ref{fig:delta} for different values of 
     \label{fig:delta}
 \end{figure}
 
-{\bf Test \ref{sec:FullModel-2}a}
+{\bf Test \ref{sec:fokkerplanck2_complete}a}
 The first test is to check the performance of the numerical solution. Let $\delta = 0.3$, $E = 0.4,\; Z = 5$, and denote: 
 $$
 p_{\parallel} = p\xi,\quad
@@ -1135,7 +1152,7 @@ The numerical solutions and contour plots at different time period are illustrat
     \includegraphics[width=.32\textwidth]{Fig_2D/T4plotPen}
     \includegraphics[width=.32\textwidth]{Fig_2D/T5plotPen.png}
     \includegraphics[width=.32\textwidth]{Fig_2D/T6plotPen.png}
-    \caption{Test \ref{sec:FullModel-2}a: Numerical solutions at different time period.}
+    \caption{Test \ref{sec:fokkerplanck2_complete}a: Numerical solutions at different time period.}
     \label{fig:sol@time}
 \end{figure}
 
@@ -1147,7 +1164,7 @@ The numerical solutions and contour plots at different time period are illustrat
     \includegraphics[width=.32\textwidth]{Fig_2D/T4Contour}
     \includegraphics[width=.32\textwidth]{Fig_2D/T5Contour}
     \includegraphics[width=.32\textwidth]{Fig_2D/T6Contour}
-    \caption{Test \ref{sec:FullModel-2}a: Contour plot for numerical solutions at different time period.}
+    \caption{Test \ref{sec:fokkerplanck2_complete}a: Contour plot for numerical solutions at different time period.}
     \label{fig:sol@contour}
 \end{figure}
 
@@ -1156,16 +1173,16 @@ It is interesting to see that the mass ($M_1$ defined in (\ref{eq:totalmass})) i
 \begin{figure}[H]
     \centering
     \includegraphics[width=.5\textwidth]{Fig_2D/MassPlot}
-    \caption{Test \ref{sec:FullModel-2}a: Plot of Mass at different time period}
+    \caption{Test \ref{sec:fokkerplanck2_complete}a: Plot of Mass at different time period}
     \label{fig:MassPlot}
 \end{figure}
 
-{\bf Test \ref{sec:FullModel-2}b} 
+{\bf Test \ref{sec:fokkerplanck2_complete}b} 
 By setting $\delta = 0.3$, $p_\text{cutoff} = 10$, and choosing different values in $E$ and $Z$, our approach has been applied to test the maximum value of $M_2$. 
 \begin{figure}[H]
     \centering
     \includegraphics[width=.5\textwidth]{./Fig_2D/Rate-Del3e-1}
-    \caption{Test \ref{sec:FullModel-2}b: Maxmium of $M_2$ for different values in $Z$.}
+    \caption{Test \ref{sec:fokkerplanck2_complete}b: Maxmium of $M_2$ for different values in $Z$.}
     \label{fig:maxM2}
 \end{figure}
 
@@ -1177,7 +1194,7 @@ Take the integral with respect to $\xi$ and denote the results as the trace. We 
 \begin{figure}[H]
     \centering
     \includegraphics[width=.5\textwidth]{Fig_2D/TracePlotE4-1Z5Del3E-1.png}
-    \caption{Test \ref{sec:FullModel-2}b: Illustration of the trace plot at time = 0 and time = 62.8.}
+    \caption{Test \ref{sec:fokkerplanck2_complete}b: Illustration of the trace plot at time = 0 and time = 62.8.}
     \label{fig:my_label3}
 \end{figure}
 
@@ -1185,9 +1202,11 @@ Take the integral with respect to $\xi$ and denote the results as the trace. We 
 \section{Sparse grid (2D) Discretization and Testing}
 \label{sec:sparse-grid-scheme}
 %
+Given the above demonstration of a typical DG-FE discretization of our problem, we now introduce sparsity into the finite element space to determine if sparse-grids are a useful approach to reducing the number of degrees of freedom required to solve this 2D problem and therefore might be a useful approach to continue this line of development toward the 5D goal of fusion Fokker-Planck solvers.   
+
 \subsection{Sparse-Grid Finite Element Space}
 \label{sec:2d-fe-space}
-The sparse-grid finite element space is constructed by truncating the full-grid finite element space. We denote the sparse-grid finite element space $\mathcal{V}^N_k$ as follows,
+The sparse-grid finite element space is constructed by a truncating the tensor product used to construct the full-grid finite element space. We denote the sparse-grid finite element space $\mathcal{V}^N_k$ as follows,
 %
 \begin{eqnarray}
 \label{Def:SG2D}
@@ -1195,6 +1214,80 @@ The sparse-grid finite element space is constructed by truncating the full-grid 
 \end{eqnarray}
 %
 The finite element spaces for full-grids in (\ref{Def:FG2D}) and sparse-grids in (\ref{Def:SG2D}) are defined by selecting the finite element space using different norms: the full-grid space uses $|{\bf n}|_{\infty}\le N$ and the sparse-grid space employs $|{\bf n}|_1\le N$. The use of the 1-norm (sometimes refered to as {\it total level}) in selecting the elements results in fewer degree of freedom for the sparse-grid solution  $\mathcal{O}(N2^N)$ when compared with $\mathcal{O}(2^N\cdot 2^N)$ for the full-grid.
+
+The finite element space for the full-grid in (\ref{Def:FG2D}) and sparse-grids in (\ref{Def:SG2D}) are differentiated by thier choice of norm: the full-grid space uses $|{\bf n}|_{\infty}\le N$ and the sparse-grid space employs $|{\bf n}|_1\le N$. The use of the 1-norm (sometimes refered to as {\it{total level}} sparse-grid selection rule) in selecting the elements results in fewer degree of freedom for the sparse-grid solution $\mathcal{O}(N2^N)$ when compared with $\mathcal{O}(2^N\cdot 2^N)$ for the full-grid. Here we investigate if this reduction in degrees of freedom preserves the accurary of the full-grid for our particular choice of coordinate system (i.e., the modified spherical coordinates in velocity space) since the applicability of (unadapted) sparse-grids is sensitive to the coordinate system as the truncated tensor product discards element resolution combinations along coordinate directions. 
+
+\subsection{Sparse-grid Accuracy Test}
+\label{sec:sg-fokkerplanck2_complete}
+%
+Here we run the \texttt{fokkerplanck2\_complete} test case used in Section~\ref{sec:fokkerplanck2_complete} on the domain $\zeta\times p\in[-1,1]\times[0.1,20]$ out to $T=50$ with time steps of $\delta t = 1$. Since this case does not have an analytic solution, our approach here is to demonstrate convergence of the solution using the full-grid, and use that converged full-grid solution as the correct answer to comapre to. We note that in practice such codes are rarely tested for convergence to the accuracy we consider here, but that it is common place to examine the distribution function on a logarithmic scale to inspect tail features, so that is how we choose to present the information. We also note that at such a large $\delta t$ the time stepping error will dominate, but since our goal is spatial covergence for a given time step this should not matter. Figure~\ref{fig:fg-slices} shows the convergence of $f(\zeta\sim 0.98,p)$ and $f(\zeta,p\sim 5)$ slices of the 2D full-grid solution as we increase the order (\texttt{deg}-1) of the spatial discretization from 5 through 15. The red and blue curves show a sufficiently small difference to be considered converged, which requires $\sim$50k degrees of freedom.  
+
+Figure~\ref{fig:sg-slices} compares the sparse-grid solution to the full-grid solution at various velocity space discretization orders. The figure shows that at higher orders (\texttt{deg}=10 and 15) the sparse-grid solution reproduces (down to $\sim 10^{-6}$ for \texttt{deg}=10) the full-grid solution with an approximate 5x reduction in the degrees of freedom required. At lower orders, the sparse-grid solution deviates from the full-grid solution. This suggests that those elelements not included in the sparse-grid finite element space are required, and that at lower orders, more resolution is required to recover the full-grid solution. One question to investigate is whether at low order, can increasing the sparse-grid resolution (\texttt{lev} / the number of elements) recover the full-grid solution at a reduced degrees of freedom. Figure~\ref{} examines this.      
+
+Look at 2 cases, i.e., low order and high order? How do the unadapted sparse grids compare to FG for low order, and for high order on this problem, i.e., does this problem show the typical sparse-grid failure due to lack of coordinate alignment, and then higher order helps? 
+%
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{FIGURES/asgard-sg-2d-plus-grid-lev5-deg12.pdf}
+    \caption{Log 10 of the the solution to Eq.~\ref{fokkerplanckmodel} (\texttt{fokkerplanck2\_complete} case) at $T=50$. Contours are shown from 0 to -9.}
+    \label{fig:sg-solution}
+\end{figure}
+%
+%
+\begin{figure}
+    \centering
+    \includegraphics[width=1.2\textwidth]{FIGURES/asgard-2d-slice-fg.pdf}
+    \caption{Convergence of the solution to Eq.~\ref{fokkerplanckmodel} (\texttt{fokkerplanck2\_complete} case) at $T=50$ with increased velocity space discretization order. The difference between the red (\texttt{deg=14}) and blue (\texttt{deg=15}) solutions is sufficiently small to use these as the converged solution.}
+    \label{fig:fg-slices}
+\end{figure}
+%
+\begin{figure}
+    \centering
+    \includegraphics[width=1.2\textwidth]{FIGURES/asgard-2d-slice-sg.pdf}
+    \caption{Comparison of slices of the full-grid and sparse-grid solutions to Eq.~\ref{fokkerplanckmodel} (\texttt{fokkerplanck2\_complete}) at $T=50$ at various velocity space discretization orders. Solid lines are full-grid, dotted lines are sparse-grid. Full-grid and sparse-grid curves of the same degree are the same color.}
+    \label{fig:sg-slices}
+\end{figure}
+%
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{FIGURES/asgard-2d-sg-error.pdf}
+    \caption{Error versus degrees-of-freedom comparison of the full-grid and sparse-grid solutions to Eq.~\ref{fokkerplanckmodel} (\texttt{fokkerplanck2\_complete}) at $T=50$ at various velocity space discretization orders and resolutions. Red lines are full-grid, blue lines are sparse-grid.}
+    \label{fig:sg-error}
+\end{figure}
+%
+The matlab command to run this case is 
+%
+\begin{code}
+asgard(fokkerplanck2_complete,'timestep_method','BE','lev',4,'deg',3,'dt',10,'num_steps',5,'grid_type','SG','time_independent_build_A',true,'output_grid','fixed')
+\end{code}
+%
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{FIGURES/asgard-element-grid.pdf}
+    \caption{Sparse grid element support for a level 4 sparse grid.}
+    \label{fig:sg-support}
+\end{figure}
+%
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth} % width of left subfigure
+		\includegraphics[width=\textwidth]{FIGURES/asgard-sg-lev4.pdf}
+		\caption{Level 4 sparse grid.} % subcaption
+	\end{subfigure}
+	\vspace{0.5em} % here you can insert horizontal or vertical space
+	\begin{subfigure}{0.32\textwidth} % width of right subfigure
+		\includegraphics[width=\textwidth]{FIGURES/asgard-sg-lev5.pdf}
+		\caption{Level 5 sparse grid.} % subcaption
+	\end{subfigure}
+	\vspace{0.5em} % here you can insert horizontal or vertical space
+	\begin{subfigure}{0.32\textwidth} % width of right subfigure
+		\includegraphics[width=\textwidth]{FIGURES/asgard-sg-lev6.pdf}
+		\caption{Level 6 sparse grid.} % subcaption
+	\end{subfigure}
+	\caption{Sparse grid locations for various levels of our heirarchical basis.} % caption for whole figure
+\end{figure}
+%
 
 In this section we compare the sparse-grid solution of our two-dimensional Fokker-Planck model described by equations (\ref{eq:2DModel-1})-(\ref{eq:2DModel-3}) to that of the full-grid to examine if the prospective benefits of sparse-grids extend to this particular problem and our particular choice of coordinate system. The addition of the acceleration of runaway electrons due to an electric field presents challenges for efficient finite element simulations. Numerical solutions demonstrate non-Maxwellian characteristics, with electrons moving towards the direction selected by the electric field. With these solutions, even traditional sparse grid methods may not be the most efficient approach. Therefore, the implementation of adaptivity is also discussed, demonstrating the effectiveness of time-dependent grids for this Fokker-Planck problem. 
 
